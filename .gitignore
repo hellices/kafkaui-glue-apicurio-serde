@@ -1,0 +1,13 @@
+# IntelliJ IDEA specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Plugin-specific files
+.idea_modules/
+
+# IntelliJ out directory (compiled classes)
+out/
+# Maven target directory
+target/
