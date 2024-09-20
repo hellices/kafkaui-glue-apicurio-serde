@@ -5,7 +5,8 @@
 
 ## 적용 가이드
 
-### 패키지 업로드
+### 패키지 경로
+[release 페이지에서 확인 가능](https://github.com/hellices/kafkaui-glue-apicurio-serde/releases)
 
 ### kafka-ui에 적용
 
@@ -22,21 +23,27 @@
   serde:
     - name: ApicurioGlueSerde
       className: com.kafka.ui.serdes.glue.ApicurioGlueSerde
-      filePath: /kafkaui-glue-apicurio-serde-1.0-SNAPSHOT-jar-with-dependencies.jar
+      filePath: /shared/kafkaui-glue-apicurio-serde-1.0-SNAPSHOT-jar-with-dependencies.jar
       properties:
-        endpont: ${apicurio url}
+        endpoint: ${apicurio url}
 ```
 
-### kafka-ui 컨테이너에서 post job으로 download 처리
+### kafka-ui 컨테이너에서 init-container로 download
 
 ```yaml
+initContainers:
+- name: init-container
+  image: busybox
+  command:
+    - /bin/sh
+    - -c
+    - cd /shared && wget https://github.com/hellices/kafkaui-glue-apicurio-serde/releases/download/v1.0.0-SNAPSHOT/kafbatui-glue-apicurio-serde-1.0-SNAPSHOT-jar-with-dependencies.jar
+  volumeMounts:
+    - name: shared-data
+      mountPath: /shared  # 파일 다운로드 경로
 containers:
-  - resources: {}
-    lifecycle:
-      postStart:
-        exec:
-          command:
-            - sh
-            - '-c'
-            - wget ${download url}
+  - name: kafka-ui
+    volumeMounts:
+    - name: shared-data
+      mountPath: /shared  # 같은 경로에 공유된 볼륨 마운트
 ```
